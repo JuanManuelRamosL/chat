@@ -12,7 +12,8 @@ const server = createServer(app)
 const io = new Server(server,{
     connectionStateRecovery:{}
 })
-//http://localhost:1122
+//url local http://localhost:1122
+//url desplegada https://chat-ksi6.onrender.com
 // token  eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3MTA2MTcwMTUsImlkIjoiNzBkZWZiMDAtZWFlMi00MTJlLWEzZmYtODBlODNiNTRkYTA5In0.ce3ho8HJprBEJw_Sr_VmtdQvAxIlUTP2MRxkQvtr1F7Yv0q7n-F4OqepvxcThtqk3Mqg_yASVCTjAImPRD_PAA
 // url    libsql://prueba-juanma-9.turso.io
 // IDENTIFICACIÓN  70defb00-eae2-412e-a3ff-80e83b54da09
@@ -38,6 +39,17 @@ const db = createClient({
       console.log('an user has disconnected')
     })
   
+    // eliminar mensajes ,hacer que al eliminar se borre el msj del cliente
+    socket.on('clear messages', async () => {
+      try {
+        await db.execute('DELETE FROM messagess');
+        io.emit('messages cleared');
+      } catch (error) {
+        console.error('Error al borrar mensajes:', error);
+      }
+    });
+    
+
     socket.on('chat message', async (msg) => {
       let result
       const username = socket.handshake.auth.username ?? 'anonymous'

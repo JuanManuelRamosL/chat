@@ -26,7 +26,7 @@ input[type="text"] {
     outline: none;
 }
 
-button {
+.enviar {
     background-color: #007bff;
     color: white;
     border: none;
@@ -37,7 +37,7 @@ button {
     transition: background-color 0.3s ease;
 }
 
-button:hover {
+.enviar:hover {
     background-color: #0056b3;
 }
 
@@ -55,3 +55,7 @@ button:hover {
     background-color: #dcf8c6;
     align-self: flex-end;
 }
+.borrar{
+    color: #fff;
+    background-color: #ca5100;
+  }
