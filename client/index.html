@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>miduChat</title>
+  <title>Chat</title>
 
   <script type="module">
     import { io } from 'https://cdn.socket.io/4.3.2/socket.io.esm.min.js'
@@ -33,10 +33,12 @@
     const input = document.getElementById('input')
     const messages = document.getElementById('messages')
 
-    socket.on('chat message', (msg, serverOffset, username) => {
-      const item = `<li id="mensajes">
-        <p>${msg}</p>
-        <small>${username}</small>
+    socket.on('chat message', (msg, serverOffset, username, socketId) => {
+      const isOwnMessage = socket.id === socketId;
+
+      const item = `<li class="${isOwnMessage ? 'own-message' : 'other-message'}">
+        <p>${username} : ${msg}</p>
+        <small></small>
       </li>`
       messages.insertAdjacentHTML('beforeend', item)
       socket.auth.serverOffset = serverOffset
@@ -46,7 +48,7 @@
 
     //elimina los mensajes de la pantalla una vez reciba el evento del bak
     socket.on('messages cleared', () => {
-  const messagesList = document.getElementById('mensajes');
+  const messagesList = document.getElementById('messages');
   messagesList.innerHTML = ''; 
 });
 
@@ -84,6 +86,7 @@ clearButton.addEventListener('click', () => {
       height: 100vh;
       padding: 36px 36px 100px 36px;
       grid-template-rows: 1fr;
+      background: linear-gradient(0deg, rgba(0,0,0,1) 0%, rgb(48, 48, 50) 100%);
     }
 
     #messages {
@@ -98,19 +101,51 @@ clearButton.addEventListener('click', () => {
 
     #messages>li {
       padding: .5rem 1rem;
+      
+      clear: both;
+      overflow-wrap: break-word;
     }
 
-    #messages>li:nth-child(odd) {
-      background: #000;
+    .own-message {
+      background-color: #3b8800; /* Color de fondo para los mensajes del usuario */
+      border-radius: 20px;
+      float: right; /* Alinea los mensajes del usuario a la derecha */
+      margin-bottom: 8px;
+      margin-top: 10px;
+      display: flex; /* Utilizar flexbox */
+      align-items: center; /* Centrar verticalmente */
+      justify-content: center;
+    }
+
+    .other-message {
+      background-color: #2e2eb7; /* Color de fondo para los mensajes de otros usuarios */
+      border-radius: 20px;
+      float: left; /* Alinea los mensajes de otros usuarios a la izquierda */
+      margin-bottom: 8px;
+      margin-top: 10px;
+      display: flex; /* Utilizar flexbox */
+      align-items: center; /* Centrar verticalmente */
+      justify-content: center;
+    }
+
+    #messages>li small {
+      color: #999;
+      display: block;
+      margin-top: 1px;
     }
 
     #chat {
       border: 1px solid #ccc;
-      border-radius: 4px;
+      border-radius: 8px;
       overflow: hidden;
-      width: 350px;
-      height: 100%;
+      width: 400px;
+      height: 115%;
       position: relative;
+      padding: 3px;
+      background-image: url('https://unageek.com/wp-content/uploads/2020/03/Fondo_pantalla_chat_WA_StarWars_UnaGeek_Oscuro.jpg'); /* URL de la imagen de fondo */
+  background-size: cover; /* Ajusta la imagen de fondo para cubrir todo el elemento */
+  background-position: center; 
+  border: none;
     }
 
     #form {
@@ -121,6 +156,11 @@ clearButton.addEventListener('click', () => {
       padding: 4px;
       position: absolute;
       right: 0;
+      margin-right: 20px;
+      background: linear-gradient(0deg, rgb(37, 37, 37) 0%, rgb(41, 41, 41) 100%);
+      transform: translateY(16px);
+      border-radius: 5px;
+      color: #fff;
     }
 
     #input {
@@ -129,6 +169,10 @@ clearButton.addEventListener('click', () => {
       flex: 1;
       margin: 4px;
       padding: 0 8px;
+      margin: 0px;
+      border: none;
+      font-size:15px;
+      background-color: #000000;
     }
 
     #input:focus {
@@ -141,30 +185,35 @@ clearButton.addEventListener('click', () => {
       border: 0;
       margin: 4px;
       border-radius: 4px;
+      padding: 8px;
     }
 
     .enviar:hover {
       background: #0cf;
     }
-    .borrar{
-    color: #fff;
-    background-color: #ca3900;
-    border: 0;
+
+    .borrar {
+      color: #fff;
+      background-color: #ca3900;
+      border: 0;
       margin: 4px;
       border-radius: 4px;
-  }
-  .borrar:hover{
-    background-color: #e02200;
-  }
+      padding: 9px;
+    }
+
+    .borrar:hover {
+      background-color: #e02200;
+    }
   </style>
 </head>
 
 <body>
   <section id="chat">
+    
     <ul id="messages"></ul>
     <form id="form">
       <button id="clear-messages" class="borrar">Borrar</button>
-      <input type="text" name="message" id="input" placeholder="Type a message" autocomplete="off" />
+      <input type="text" name="message" id="input" placeholder="Envia un mensaje :)" autocomplete="off" />
       <button type="submit" class="enviar">Enviar</button>
       
     </form>

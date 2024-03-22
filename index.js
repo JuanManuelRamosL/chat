@@ -42,8 +42,9 @@ const db = createClient({
     // eliminar mensajes ,hacer que al eliminar se borre el msj del cliente
     socket.on('clear messages', async () => {
       try {
-        await db.execute('DELETE FROM messagess');
         io.emit('messages cleared');
+        await db.execute('DELETE FROM messagess');
+       
       } catch (error) {
         console.error('Error al borrar mensajes:', error);
       }
@@ -64,7 +65,7 @@ const db = createClient({
         return
       }
   
-      io.emit('chat message', msg, result.lastInsertRowid.toString(), username)
+      io.emit('chat message', msg, result.lastInsertRowid.toString(), username, socket.id)
     })
   
     if (!socket.recovered) { // <- recuperase los mensajes sin conexión
@@ -75,8 +76,10 @@ const db = createClient({
         })
   
         results.rows.forEach(row => {
-          socket.emit('chat message', row.content, row.id.toString(), row.user)
-        })
+          const { content, id, user } = row;
+        const isOwnMessage = user === socket.handshake.auth.username;
+        io.to(socket.id).emit('chat message', content, id.toString(), user, isOwnMessage);
+      });
       } catch (e) {
         console.error(e)
       }
